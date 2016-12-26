@@ -1,0 +1,239 @@
+<html>
+    <head>
+        <META HTTP-EQUIV="content-language" CONTENT="ru">
+        <meta http-equiv="content-type" content="text/html; charset=utf-8">
+        <script type="text/javascript" src="js/jquery.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/jquery.blockUI.js" charset="utf-8"></script>
+        <script type="text/javascript" src="js/crypto_object.js" charset="utf-8"></script>
+        <link href="css/style.css" rel="stylesheet" type="text/css"/>
+        <title>Тестирование функционала апплета</title>
+    </head>
+
+    <body>	
+        <div class="content">	
+            <div>
+                <span id="appstatus" style="color:blue; font-size:18px;">Loading...</span><br><br>
+                <span style="font-size:18px; color: blue">Тип хранилища ключа:</span><br/>
+                <select onchange="chooseStoragePath();" id="storageAlias" size="1" style="width:100%;">	
+                    <option value="NONE">-- Выберите тип --</option>
+                    <option value="PKCS12">Ваш Компьютер</option>
+                    <option value="AKKaztokenStore">Казтокен</option>
+                    <option value="AKKZIDCardStore">Личное Удостоверение</option>
+                    <option value="AKEToken72KStore">EToken Java 72k</option>
+                    <option value="AKJaCartaStore">AK JaCarta</option>
+                </select>
+                <br/>
+                <br/>
+                <span style="font-size:18px; color: blue">Путь хранилища ключа:</span><br/>
+                <input type="text" readonly="readonly"  id="storagePath" value="" style="width:100%;"/>
+                <br/>
+                <br/>
+                <span style="font-size:18px; color: blue">Пароль для хранилища:</span><br/>
+                <input id="password" type="password" style="width: 100%;"/>&nbsp;
+                <br/>
+                <span style="font-size:18px; color: blue">Тип ключа:</span><br/>
+                <input type="radio" value="SIGN" name="keyType" /> Для подписи 
+                <br/>
+                <input type="radio" value="AUTH" name="keyType" /> Для аутентификаций
+                <br/>
+                <input type="radio" value="ALL" name="keyType" checked /> Любой
+                <br/>
+                <br/>
+                <span style="font-size:18px; color: blue">Список ключей:</span><br/>
+                <input type="hidden" id="keyAlias" value=""/>
+                <select  onchange="keysOptionChanged();" id="keys" style="width: 70%;"></select>&nbsp;
+                <input style="float: right; width: 28%" value="Обновить список ключей" onclick="fillKeys();" type="button"/>
+            </div>
+            <br/><br/>
+
+            <div>
+                <span style="font-size:18px; color: blue">Время начала действия сертификата(<span style="color: black; font-family: monospace">getNotBefore</span>):</span><br/>
+                <input type="text" readonly  id="notbefore" value="Нажмите на кнопку чтобы узнать" style="width: 70%"/>
+                <input value="Сертификат действителен с" onclick="getNotBefore();" type="button" style="width: 28%; float: right"/>
+            </div>
+            <br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Время исхода действия сертификата(<span style="color: black; font-family: monospace">getNotAfter</span>):</span><br/>
+                <input type="text" readonly  id="notafter" value="Нажмите на кнопку чтобы узнать" style="width: 70%"/>
+                <input value="Сертификат действителен до" onclick="getNotAfter();" type="button" style="width: 28%; float: right"/>
+            </div>
+            <br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Получить данные субъекта(<span style="color: black; font-family: monospace">getSubjectDN</span>):</span><br/>
+                <textarea readonly  id="subjectDn" style="width:100%; height: 60px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+                <input value="Получить данные субъекта" onclick="getSubjectDN();" type="button" style="width: 100%; margin-top: 5px; height: 25px; float: right"/>
+            </div>
+            <br/><br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Получить данные Удостоверяющего центра(<span style="color: black; font-family: monospace">getIssuerDN</span>):</span><br/>
+                <textarea readonly  id="issuerDn" style="width: 100%; height: 60px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+                <input value="Данные Удостоверяющего центра" onclick="getIssuerDN();" type="button" style="width: 100%; margin-top: 5px; height: 25px; float: right"/>
+            </div>
+            <br/>
+            <br/>
+            <br/>
+            <br/>
+            <div>
+                <span style="font-size:18px; color: blue">Получить значение RDN по OID(<span style="color: black; font-family: monospace">getRdnByOid</span>):</span><br/>
+                <br/>
+                <input type="radio" value="2.5.4.7" name="oid" /> Локализация(L)
+                <br/>
+                <input type="radio" value="2.5.4.3" name="oid" checked/> Общепринятое имя(CN)
+                <br/>
+                <input type="radio" value="2.5.4.4" name="oid"/> Фамилия(SURNAME)
+                <br/>
+                <input type="radio" value="2.5.4.5" name="oid"/> ИИН(SERIALNUMBER)
+                <br/>
+                <input type="radio" value="2.5.4.6" name="oid"/> Страна(C)
+                <br/>
+                <input type="radio" value="2.5.4.8" name="oid"/> Область(S)
+                <br/>
+                <input type="radio" value="2.5.4.10" name="oid"/> Название организации(O)
+                <br/>
+                <input type="radio" value="2.5.4.11" name="oid"/> БИН(OU)
+                <br/>
+                <input type="radio" value="1.2.840.113549.1.9.1" name="oid"/> Адрес электронной почты(E)
+                <br/>
+                <input type="radio" value="0.9.2342.19200300.100.1.25" name="oid"/> Компонент домена(DC)
+                <br/>
+                <input type="radio" value="2.5.4.15" name="oid" /> Бизнес категория(BC)
+                <br/>
+                <br/>
+                <input type="text" readonly  id="rdnvalue" value="Нажмите на кнопку чтобы узнать" style="width: 70%"/>
+                <input value="Получить RDN по OID" onclick="getRdnByOid();" type="button" style="width: 28%; float: right"/>
+                <br/>
+                <br/>
+            </div>
+            <br/><br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Введите данные для подписи(<span style="color: black; font-family: monospace">signPlainData</span>):</span><br/>
+                <input type="text" id="date" value="" style="width: 70%"/>
+                <input value="Подпиcать данные" onclick="signPlainData();" type="button" style="width: 28%; float: right"/>
+                <br/><br/>
+                <span style="font-size:18px; color: blue">Проверить подписанные данные(<span style="color: black; font-family: monospace">verifyPlainData</span>):</span><br/>
+                <textarea readonly id="signature" style="width: 70%; height: 110px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+
+                <span id="identifier" style="width: 28%; float: right; color: green; font-size: 25px; text-align: center; padding-top: 30px">Не проверено</span>
+                <br/>
+                <input value="Проверить данные" onclick="verifyPlainData();" type="button" style="width: 100%; height: 25px; float: right"/>
+            </div>
+            <br/><br/><br/><br/><br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Введите данные для подписи(<span style="color: black; font-family: monospace">createCMSSignature</span>):</span><br/>
+                <input type="text" id="dateCMS" value="" style="width: 70%"/>
+                <input type="checkbox" id="flag" /> Включить данные в подпись
+                <br/>
+                <input value="Подписать данные" onclick="createCMSSignature();" type="button" style="width: 100%; height: 25px; margin-top: 5px; "/>
+                <br/><br/>
+                <span style="font-size:18px; color: blue">Проверить подисанные данные(<span style="color: black; font-family: monospace">verifyCMSSignature</span>):</span><br/>
+                <textarea readonly id="signatureCMS" style="width: 70%; height: 110px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+                <span id="identifierCMS" style="width: 28%; float: right; color: green; font-size: 25px; text-align: center; padding-top: 30px">Не проверено</span>
+                <br/>
+                <input value="Проверить данные" onclick="verifyCMSSignature();" type="button" style="width: 100%; height: 25px; float: right"/>
+            </div>
+            <br/>
+            <br/><br/><br/><br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">XML для подписи(<span style="color: black; font-family: monospace">signXML</span>):</span><br/>
+                <textarea id="dateXML" style="width: 100%; height: 170px"><?xml version="1.0" encoding="utf-8"?>
+                <root>
+                    <name>Ivan</name>
+                    <iin>123456789012</iin>
+                </root>
+                </textarea>
+                <br/>
+                <input value="Подписать данные" onclick="signXml();" type="button" style="width: 100%; height: 25px; margin-top: 5px; "/>
+                <br/><br/>
+                <span style="font-size:18px; color: blue">Проверить подписанный XML(<span style="color: black; font-family: monospace">verifyXml</span>):</span><br/>
+                <textarea id="signatureXML" style="width: 70%; height: 170px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+                <span id="identifierXML" style="width: 28%; float: right; color: green; font-size: 25px; text-align: center; padding-top: 50px">Не проверено</span>
+                <br/>
+                <input value="Проверить данные" onclick="verifyXml();" type="button" style="width: 100%; height: 25px; float: right"/>
+            </div>
+            <br/><br/><br/><br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Подписать XML по идентификатору элемента(<span style="color: black; font-family: monospace">signXMLById</span>):</span><br/>
+                <textarea id="dateXMLById" style="width: 100%; height: 170px"><?xml version="1.0" encoding="utf-8"?>
+                <root>
+                    <person id="personId">
+                        <name>Ivan</name>
+                        <iin>123456789012</iin>
+                    </person>
+                    <company id="companyId">
+                        <name>Company Name</name>
+                        <bin>123456789012</bin>
+                    </company>
+                </root>
+                </textarea>
+                <br/><br/>
+                <span style="font-size:14px; width: 180px">Подписываемый элемент XML:</span> <input id="xmlElemName" autocomplete="off" style="width: 100%" type="text"/>
+                <br/><br/>
+                <span style="font-size:14px; width: 180px">Имя атрибута идентификации элемента XML:</span> <input id="xmlIdAttrName" autocomplete="off" style="width: 100%" type="text"/>
+                <br/><br/>
+                <span style="font-size:14px; width: 180px">Верхний элемент для подписи:</span> <input id="signatureParentElement" autocomplete="off" style="width: 100%" type="text"/>
+                <br/>
+                <input value="Подписать данные" onclick="signXmlByElementId();" type="button" style="width: 100%; height: 25px; margin-top: 5px; "/>
+                <br/><br/>
+                <span style="font-size:18px; color: blue">Проверить подписанный XML(<span style="color: black; font-family: monospace">verifyXml(String elemId)</span>):</span><br/>
+                <textarea id="signatureXMLById" style="width: 70%; height: 170px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+                <span id="identifierXMLById" style="width: 28%; float: right; color: green; font-size: 25px; text-align: center; padding-top: 50px">Не проверено</span>
+                <br/><br/>
+                <span style="font-size:14px; width: 180px">Имя атрибута идентификации элемента XML:</span> <input id="xmlIdAttrName" autocomplete="off" style="width: 100%" type="text"/>
+                <br/><br/>
+                <span style="font-size:14px; width: 180px">Верхний элемент для подписи:</span> <input id="signatureParentElement" autocomplete="off" style="width: 100%" type="text"/>
+                <br/>
+                <input value="Проверить данные" onclick="verifyXmlById();" type="button" style="width: 100%; height: 25px; float: right"/>
+            </div>
+            <br/><br/><br/><br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Введите путь к файлу для подписи(<span style="color: black; font-family: monospace">createCMSSignatureFromFile</span>):</span><br/>
+                <input id="filePath" name="filePath" autocomplete="off" style="width: 70%" type="text" readonly="readonly">
+                <input type="checkbox" id="flagFile" /> Включить данные в подпись 
+                <br /><br />
+                <input name="selectFileToSign" id="selectFileToSign" value="Выбрать файл для подписания" onclick="selectFileToSign();" type="button" style="width: 28%; float: left">
+                <input value="Подпиcать данные" onclick="createCMSSignatureFromFile();" type="button" style="width: 28%; float: left"/>
+                <br/><br/>
+                <span style="font-size:18px; color: blue">Проверить подисанные данные(<span style="color: black; font-family: monospace">verifyCMSSignatureFromFile</span>):</span><br/>
+                <textarea readonly id="signatureCMSFile" style="width: 70%; height: 110px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+                <span id="identifierCMSFile" style="width: 28%; float: right; color: green; font-size: 25px; text-align: center; padding-top: 30px">Не проверено</span>
+                <br/>
+                <input value="Проверить данные" onclick="verifyCMSSignatureFromFile();" type="button" style="width: 100%; height: 25px; float: right"/>
+            </div>
+            <br/><br/><br/><br/><br/>
+            <div>
+                <span style="font-size:18px; color: blue">Получить Хэш данных по указанному алгоритму(<span style="color: black; font-family: monospace">getHash</span>):</span>
+                <br/>
+                <br/>   
+                <span style="font-size:14px; width: 180px"> Выберите алгоритм хеширование: </span><select id="hashAlg" style="width: 100%"><option value="SHA1">SHA1</option><option value="SHA256">SHA256</option><option value="GOST34311">GOST34311</option></select>
+                <br/>
+                <br/>
+                <span style="font-size:14px; width: 180px">Введите данные для хеширование:</span> <input id="dataHash" autocomplete="off" style="width: 100%" type="text"/>
+                <br /><br />
+                <textarea readonly id="hashArea" style="width: 100%; height: 110px">
+                    Нажмите на кнопку чтобы узнать
+                </textarea>
+                <br/>
+                <input value="Получить Хэш" onclick="getHash();" type="button" style="width: 100%; float: left"/>
+                <br/><br/>
+
+            </div>
+            <br/>
+            <br/>
+            <br/>
+        </div>
+    </body>
+</html>
